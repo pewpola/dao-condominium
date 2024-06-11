@@ -33,8 +33,12 @@ contract Condominium {
     }
 
     modifier onlyResidents() {
-        require(msg.sender == manager || residents[msg.sender] > 0, "Only the manager or the residents can do this");
+        require(msg.sender == manager || isResident(msg.sender), "Only the manager or the residents can do this");
         _;
+    }
+
+    function isResident(address resident) public view returns (bool) {
+        return residents[resident] > 0;
     }
 
     
