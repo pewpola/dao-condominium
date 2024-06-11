@@ -4,7 +4,11 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "npx hardhat node",
+    "test": "npx hardhat test",
+    "compile": "npx hardhat compile",
+    "deploy:dev": "npx hardhat ignition deploy ignition/modules/Condominium.ts --network local",
+    "deploy:prod": "npx hardhat ignition deploy ignition/modules/Condominium.ts --network fantom"
   },
   "keywords": [],
   "author": "",
