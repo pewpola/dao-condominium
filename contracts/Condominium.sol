@@ -41,6 +41,8 @@ contract Condominium {
         return residents[resident] > 0;
     }
 
-    
+    function residenceExists(uint16 residenceId) public view returns (bool) {
+        return residences[residenceId];
+    }
 
 }
