@@ -16,7 +16,9 @@ contract Condominium {
                 // apartamentos
                 for (uint8 k = 1; k <= 5; k++) {
                     // unidades
-                    residences[(i * 1000) + (j * 100) + k] = true;
+                    unchecked {
+                        residences[(i * 1000) + (j * 100) + k] = true;
+                    }
                 }
             }
         }
