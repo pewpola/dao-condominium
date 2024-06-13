@@ -22,7 +22,49 @@ describe("Condominium", function () {
     const { contract, manager, resident } = await loadFixture(deployFixture);
 
     await contract.addResident(resident.address, 2102);
+
     expect(await contract.isResident(resident.address)).to.equal(true);
   });
+
+  it("Should NOT add a resident (permission)", async function () {
+    const { contract, manager, resident } = await loadFixture(deployFixture);
+
+    const instance = contract.connect(resident);
+    
+    await expect(instance.addResident(resident.address, 2102)).to.be.revertedWith("Only the manager or the council can do this");
+  });
+
+  it("Should NOT add a resident (residence does not exist)", async function () {
+    const { contract, manager, resident } = await loadFixture(deployFixture);
+
+    await expect(contract.addResident(resident.address, 3000)).to.be.revertedWith("This residence does not exist");
+  });
+
+  it("Should remove a resident", async function () {
+    const { contract, manager, resident } = await loadFixture(deployFixture);
+
+    await contract.addResident(resident.address, 2102);
+    await contract.removeResident(resident.address);
+
+    expect(await contract.isResident(resident.address)).to.equal(false);
+  });
+
+  it("Should NOT remove a resident (permission)", async function () {
+    const { contract, manager, resident } = await loadFixture(deployFixture);
+
+    const instance = contract.connect(resident);
+    await contract.addResident(resident.address, 2102);
+
+    await expect(instance.removeResident(resident.address)).to.be.revertedWith("Only the manager can do this");
+  });
+
+  // it("Should NOT remove a resident (counselor cannot be removed)", async function () {
+  //   const { contract, manager, resident } = await loadFixture(deployFixture);
+
+  //   const instance = contract.connect(resident);
+  //   await contract.addResident(resident.address, 2102);
+
+  //   await expect(instance.removeResident(resident.address)).to.be.revertedWith("Only the manager can do this");
+  // });
 
 });
