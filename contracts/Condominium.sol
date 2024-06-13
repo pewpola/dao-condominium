@@ -55,7 +55,8 @@ contract Condominium {
 
     function removeResident(address resident) external onlyManager {
         require(!counselors[resident], "A counselor cannot be removed");
-
+        delete residents[resident];
+        
         if (counselors[resident]) delete residents[resident];
     }
 
