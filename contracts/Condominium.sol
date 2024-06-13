@@ -64,5 +64,10 @@ contract Condominium {
             require(isResident(resident), "The counselor must be a resident");
             counselors[resident] = true;
         } else delete counselors[resident];
-    } 
+    }
+
+    function setManager(address newManager) external onlyManager {
+        require(newManager != address(0), "The address must be valid");
+        manager = newManager;
+    }
 }
