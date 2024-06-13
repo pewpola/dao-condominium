@@ -18,10 +18,11 @@ describe("Condominium", function () {
     expect(await contract.residenceExists(2102)).to.equal(true);
   });
 
-  // it("Should be a resident", async function () {
-  //   const { contract, manager, resident } = await loadFixture(deployFixture);
+  it("Should add a resident", async function () {
+    const { contract, manager, resident } = await loadFixture(deployFixture);
 
-  //   expect(await contract.isResident(resident.address)).to.equal(false);
-  // });
+    await contract.addResident(resident.address, 2102);
+    expect(await contract.isResident(resident.address)).to.equal(true);
+  });
 
 });

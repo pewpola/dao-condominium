@@ -47,4 +47,8 @@ contract Condominium {
         return residences[residenceId];
     }
 
+    function addResident(address resident, uint16 residenceId) external onlyCouncil {
+        require(residenceExists(residenceId), "This residence does not exist");
+        residents[resident] = residenceId;
+    }
 }
