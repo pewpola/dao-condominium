@@ -67,4 +67,13 @@ describe("Condominium", function () {
     await expect(contract.removeResident(resident.address)).to.be.revertedWith("A counselor cannot be removed");
   });
 
+  it("Should set counselor", async function () {
+    const { contract, manager, resident } = await loadFixture(deployFixture);
+
+    await contract.addResident(resident.address, 2102);
+    await contract.setCounselor(resident.address, true);
+
+    expect(await contract.counselors(resident.address)).to.equal(true);
+  });
+
 });
