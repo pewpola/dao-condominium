@@ -58,13 +58,13 @@ describe("Condominium", function () {
     await expect(instance.removeResident(resident.address)).to.be.revertedWith("Only the manager can do this");
   });
 
-  // it("Should NOT remove a resident (counselor cannot be removed)", async function () {
-  //   const { contract, manager, resident } = await loadFixture(deployFixture);
+  it("Should NOT remove a resident (counselor cannot be removed)", async function () {
+    const { contract, manager, resident } = await loadFixture(deployFixture);
 
-  //   const instance = contract.connect(resident);
-  //   await contract.addResident(resident.address, 2102);
+    await contract.addResident(resident.address, 2102);
+    await contract.setCounselor(resident.address, true);
 
-  //   await expect(instance.removeResident(resident.address)).to.be.revertedWith("Only the manager can do this");
-  // });
+    await expect(contract.removeResident(resident.address)).to.be.revertedWith("A counselor cannot be removed");
+  });
 
 });
