@@ -76,4 +76,19 @@ describe("Condominium", function () {
     expect(await contract.counselors(resident.address)).to.equal(true);
   });
 
+  it("Should NOT set counselor (permission)", async function () {
+    const { contract, manager, resident } = await loadFixture(deployFixture);
+
+    const instance = contract.connect(resident);
+    await contract.addResident(resident.address, 2102);
+
+    await expect(instance.setCounselor(resident.address, true)).to.be.revertedWith("Only the manager can do this");
+  });
+
+  it("Should NOT set counselor (not a resident)", async function () {
+    const { contract, manager, resident } = await loadFixture(deployFixture);
+
+    await expect(contract.setCounselor(resident.address, true)).to.be.revertedWith("The counselor must be a resident");
+  });
+  
 });
