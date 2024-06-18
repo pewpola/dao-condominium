@@ -90,5 +90,24 @@ describe("Condominium", function () {
 
     await expect(contract.setCounselor(resident.address, true)).to.be.revertedWith("The counselor must be a resident");
   });
+
+  it("Should set counselor (leaving)", async function () {
+    const { contract, manager, resident } = await loadFixture(deployFixture);
+
+    await contract.addResident(resident.address, 2102);
+    await contract.setCounselor(resident.address, true);
+    await contract.setCounselor(resident.address, false);
+
+    expect(await contract.counselors(resident.address)).to.equal(false);
+  });
+
+  it("Should set manager", async function () {
+    const { contract, manager, resident } = await loadFixture(deployFixture);
+
+    await contract.setManager(resident.address);
+
+    expect(await contract.manager()).to.equal(resident.address);
+  });
+
   
 });
