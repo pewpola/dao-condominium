@@ -98,4 +98,19 @@ contract Condominium {
     function topicExists(string memory title) public view returns(bool) {
         return getTopic(title).createdDate > 0;
     }
+
+    function addTopic(string memory title, string memory descrition) external onlyResidents {
+        require(!topicExists(title), "This topic already exists");
+
+        Topic memory newTopic = Topic({
+            title: title,
+            description: descrition,
+            createdDate: block.timestamp,
+            startDate: 0,
+            endDate: 0,
+            status: Status.IDLE
+        });
+
+        topics[keccak256(bytes(title))] = newTopic;
+    }
 }
