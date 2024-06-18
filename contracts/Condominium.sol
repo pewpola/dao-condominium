@@ -7,6 +7,24 @@ contract Condominium {
     mapping(address => uint16) public residents; // wallet => unidade (1001) -> (2505)
     mapping(address => bool) public counselors; // conselheiro => true
 
+    enum Status {
+        IDLE,
+        VOTING,
+        APPROVED,
+        DENIED
+    }
+
+    struct Topic {
+        string title;
+        string description;
+        Status status;
+        uint256 createdDate;
+        uint256 startDate;
+        uint256 endDate;
+    }
+
+    mapping(bytes32 => Topic) public topics;
+
     constructor() {
         manager = msg.sender;
 
