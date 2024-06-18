@@ -113,4 +113,10 @@ contract Condominium {
 
         topics[keccak256(bytes(title))] = newTopic;
     }
+
+    function removeTopic(string memory title) external onlyManager {
+        Topic memory topic = getTopic(title);
+        require(topic.status == Status.IDLE, "Only IDLE topics can be removed");
+        delete topics[keccak256(bytes(title))];
+    }
 }
