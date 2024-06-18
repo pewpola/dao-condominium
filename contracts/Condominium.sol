@@ -89,4 +89,13 @@ contract Condominium {
         require(newManager != address(0), "The address must be valid");
         manager = newManager;
     }
+
+    function getTopic(string memory title) public view returns(Topic memory) {
+        bytes32 topicId = keccak256(bytes(title));
+        return topics[topicId];
+    }
+
+    function topicExists(string memory title) public view returns(bool) {
+        return getTopic(title).createdDate > 0;
+    }
 }
