@@ -134,4 +134,14 @@ contract Condominium {
         require(topic.status == Status.IDLE, "Only IDLE topics can be removed");
         delete topics[keccak256(bytes(title))];
     }
+
+    function openVoting(string memory title) external onlyManager {
+        Topic memory topic = getTopic(title);
+        require(topic.createdDate > 0, "The topic does not exist");
+        require(topic.status == Status.IDLE, "Only IDLE topics can be open for voting");
+
+        bytes32 topicId = keccak256(bytes(title));
+        topics[topicId].status = Status.VOTING;
+        topics[topicId].startDate = block.timestamp;
+    }
 }
