@@ -131,4 +131,39 @@ describe("Condominium", function () {
     .to.be.revertedWith("The address must be valid");
   });
 
+  it("Should add topic", async function () {
+    const { contract, manager, resident } = await loadFixture(deployFixture);
+
+    await contract.addResident(resident.address, 1202);
+
+    const instance = contract.connect(resident);
+    await instance.addTopic("test", "test test");
+
+    expect(await contract.topicExists("test")).to.equal(true);
+  });
+
+  it("Should NOT add topic (permission)", async function () {
+    const { contract, manager, resident } = await loadFixture(deployFixture);
+
+    await contract.addResident(resident.address, 1202);
+    await contract.setCounselor(resident.address, true);
+
+    const instance = contract.connect(resident);
+
+    expect(await instance.addTopic("test","test test"))
+    .to.be.revertedWith("Only the manager or the residents can do this");
+  });
+
+  it("Should NOT add topic (already exists)", async function () {
+    const { contract, manager, resident } = await loadFixture(deployFixture);
+
+    await contract.addResident(resident.address, 1202);
+
+    const instance = contract.connect(resident);
+    await instance.addTopic("test", "test test");
+
+    await expect(instance.addTopic("test", "test test"))
+    .to.be.revertedWith("This topic already exists");
+  });
+
 });
