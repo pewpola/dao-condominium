@@ -166,4 +166,36 @@ describe("Condominium", function () {
     .to.be.revertedWith("This topic already exists");
   });
 
+  it("Should remove topic", async function () {
+    const { contract, manager, resident } = await loadFixture(deployFixture);
+
+    await contract.addResident(resident.address, 1202);
+    await contract.setManager(resident.address);
+
+    const instance = contract.connect(resident);
+    await instance.addTopic("test", "test test");
+
+    await instance.removeTopic("test");
+
+    expect(await contract.topicExists("test")).to.equal(false);
+  });
+
+  it("Should NOT remove topic (permission)", async function () {
+    const { contract, manager, resident } = await loadFixture(deployFixture);
+
+    await contract.addResident(resident.address, 1202);
+
+    const residentInstance = contract.connect(resident);
+    await residentInstance.addTopic("test", "test test");
+
+    await contract.setCounselor(resident.address, true);
+
+    const counselorInstance = contract.connect(resident);
+
+    await expect(residentInstance.removeTopic("test"))
+    .to.be.revertedWith("Only the manager can do this");
+    await expect(counselorInstance.removeTopic("test"))
+    .to.be.revertedWith("Only the manager can do this");
+  });
+
 });
