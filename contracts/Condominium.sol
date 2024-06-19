@@ -31,7 +31,7 @@ contract Condominium {
     }
 
     struct Vote {
-        address author;
+        address resident;
         uint16 residence;
         Options option;
         uint256 timestamp;
@@ -143,5 +143,33 @@ contract Condominium {
         bytes32 topicId = keccak256(bytes(title));
         topics[topicId].status = Status.VOTING;
         topics[topicId].startDate = block.timestamp;
+    }
+
+    function vote(string memory title, Options option) external onlyResidents {
+        require(option != Options.EMPTY, "The option cannot be EMPTY");
+
+        Topic memory topic = getTopic(title);
+        require(topic.createdDate > 0, "The topic does not exist");
+        require(topic.status == Status.VOTING, "Only VOTING topics can be voted");
+
+        uint16 residence = residents[msg.sender];
+        bytes32 topicId = keccak256(bytes(title));
+
+        Vote[] memory votes = votings[topicId];
+
+        for (uint i = 0; i < votes.length; i++) {
+            if (votes[i].residence == residence) {
+                require(false, "A residence should vote only once");
+            }
+        }
+
+        Vote memory newVote = Vote({
+            resident: msg.sender,
+            residence: residence,
+            option: option,
+            timestamp: block.timestamp
+        });
+
+        votings[topicId].push(newVote);
     }
 }
