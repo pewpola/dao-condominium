@@ -63,12 +63,18 @@ contract Condominium {
     }
 
     modifier onlyCouncil() {
-        require(msg.sender == manager || counselors[msg.sender], "Only the manager or the council can do this");
+        require(
+            msg.sender == manager || counselors[msg.sender],
+            "Only the manager or the council can do this"
+        );
         _;
     }
 
     modifier onlyResidents() {
-        require(msg.sender == manager || isResident(msg.sender), "Only the manager or the residents can do this");
+        require(
+            msg.sender == manager || isResident(msg.sender),
+            "Only the manager or the residents can do this"
+        );
         _;
     }
 
@@ -80,7 +86,10 @@ contract Condominium {
         return residences[residenceId];
     }
 
-    function addResident(address resident, uint16 residenceId) external onlyCouncil {
+    function addResident(
+        address resident,
+        uint16 residenceId
+    ) external onlyCouncil {
         require(residenceExists(residenceId), "This residence does not exist");
 
         residents[resident] = residenceId;
@@ -93,7 +102,10 @@ contract Condominium {
         if (counselors[resident]) delete counselors[resident];
     }
 
-    function setCounselor(address resident, bool isEntering) external onlyManager {
+    function setCounselor(
+        address resident,
+        bool isEntering
+    ) external onlyManager {
         if (isEntering) {
             require(isResident(resident), "The counselor must be a resident");
             counselors[resident] = true;
@@ -105,16 +117,19 @@ contract Condominium {
         manager = newManager;
     }
 
-    function getTopic(string memory title) public view returns(Topic memory) {
+    function getTopic(string memory title) public view returns (Topic memory) {
         bytes32 topicId = keccak256(bytes(title));
         return topics[topicId];
     }
 
-    function topicExists(string memory title) public view returns(bool) {
+    function topicExists(string memory title) public view returns (bool) {
         return getTopic(title).createdDate > 0;
     }
 
-    function addTopic(string memory title, string memory descrition) external onlyResidents {
+    function addTopic(
+        string memory title,
+        string memory descrition
+    ) external onlyResidents {
         require(!topicExists(title), "This topic already exists");
 
         Topic memory newTopic = Topic({
@@ -138,7 +153,10 @@ contract Condominium {
     function openVoting(string memory title) external onlyManager {
         Topic memory topic = getTopic(title);
         require(topic.createdDate > 0, "The topic does not exist");
-        require(topic.status == Status.IDLE, "Only IDLE topics can be open for voting");
+        require(
+            topic.status == Status.IDLE,
+            "Only IDLE topics can be open for voting"
+        );
 
         bytes32 topicId = keccak256(bytes(title));
         topics[topicId].status = Status.VOTING;
@@ -150,7 +168,10 @@ contract Condominium {
 
         Topic memory topic = getTopic(title);
         require(topic.createdDate > 0, "The topic does not exist");
-        require(topic.status == Status.VOTING, "Only VOTING topics can be voted");
+        require(
+            topic.status == Status.VOTING,
+            "Only VOTING topics can be voted"
+        );
 
         uint16 residence = residents[msg.sender];
         bytes32 topicId = keccak256(bytes(title));
@@ -171,5 +192,35 @@ contract Condominium {
         });
 
         votings[topicId].push(newVote);
+    }
+
+    function closeVoting(string memory title) external onlyManager {
+        Topic memory topic = getTopic(title);
+        require(topic.createdDate > 0, "The topic does not exist");
+        require(
+            topic.status == Status.IDLE,
+            "Only VOTING topics can be open for closed"
+        );
+
+        uint8 approved = 0;
+        uint8 denied = 0;
+        uint8 abstentions = 0;
+
+        bytes32 topicId = keccak256(bytes(title));
+        Vote[] memory votes = votings[topicId];
+
+        for (uint8 i = 0; i < votes.length; i++) {
+            if(votes[i].option == Options.YES) 
+                approved++;
+            else if(votes[i].option == Options.NO) 
+                denied++;
+            else 
+                abstentions++;
+        }
+
+        if (approved > denied) topics[topicId].status = Status.APPROVED;
+        else topics[topicId].status = Status.DENIED;
+
+        topics[topicId].endDate = block.timestamp;
     }
 }
