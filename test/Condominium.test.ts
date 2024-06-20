@@ -4,11 +4,11 @@ import hre from "hardhat";
 
 describe("Condominium", function () {
 
-  enum Status {
-    IDLE = 0,
-    VOTING = 1,
-    APPROVED = 2,
-    DENIED = 3
+  enum Options {
+    EMPTY = 0,
+    YES = 1,
+    NO = 2,
+    ABSTENTION = 3
   }
 
   async function deployFixture() {
@@ -214,6 +214,22 @@ describe("Condominium", function () {
     
     await expect(contract.removeTopic("test"))
     .to.be.revertedWith("Only IDLE topics can be removed");
+  });
+
+  it("Should remove topic", async function () {
+    const { contract, manager, resident } = await loadFixture(deployFixture);
+
+    await contract.addResident(resident.address, 1202);
+    await contract.setManager(resident.address);
+
+    const instance = contract.connect(resident);
+    await instance.addTopic("topic", "description");
+    
+    await contract.openVoting("topic");
+
+    await instance.vote("topic", 1);
+
+    expect(await contract.topicExists("topic")).to.equal(false);
   });
 
 });
