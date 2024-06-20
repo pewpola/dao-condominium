@@ -198,7 +198,7 @@ contract Condominium {
         Topic memory topic = getTopic(title);
         require(topic.createdDate > 0, "The topic does not exist");
         require(
-            topic.status == Status.IDLE,
+            topic.status == Status.VOTING,
             "Only VOTING topics can be closed"
         );
 
