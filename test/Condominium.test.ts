@@ -216,20 +216,85 @@ describe("Condominium", function () {
     .to.be.revertedWith("Only IDLE topics can be removed");
   });
 
-  it("Should remove topic", async function () {
+  it("Should vote", async function () {
     const { contract, manager, resident } = await loadFixture(deployFixture);
 
     await contract.addResident(resident.address, 1202);
-    await contract.setManager(resident.address);
 
     const instance = contract.connect(resident);
     await instance.addTopic("topic", "description");
     
     await contract.openVoting("topic");
 
-    await instance.vote("topic", 1);
+    await instance.vote("topic", Options.YES);
 
-    expect(await contract.topicExists("topic")).to.equal(false);
+    expect(await contract.votesCounter("topic")).to.equal(1);
+  });
+
+  it("Should NOT vote (empty choice)", async function () {
+    const { contract, manager, resident } = await loadFixture(deployFixture);
+
+    await contract.addResident(resident.address, 1202);
+
+    const instance = contract.connect(resident);
+    await instance.addTopic("topic", "description");
+    
+    await contract.openVoting("topic");
+
+    await expect(instance.vote("topic", Options.EMPTY))
+    .to.be.revertedWith("The option cannot be EMPTY");
+  });
+
+  it("Should NOT vote (topic does not exist)", async function () {
+    const { contract, manager, resident } = await loadFixture(deployFixture);
+
+    await contract.addResident(resident.address, 1202);
+
+    const instance = contract.connect(resident);
+    
+    await expect(instance.vote("topic", Options.YES))
+    .to.be.revertedWith("The topic does not exist");
+  });
+
+  it("Should NOT vote (not opened for voting)", async function () {
+    const { contract, manager, resident } = await loadFixture(deployFixture);
+
+    await contract.addResident(resident.address, 1202);
+
+    const instance = contract.connect(resident);
+    await instance.addTopic("topic", "description");
+    
+    await expect(instance.vote("topic", Options.YES))
+    .to.be.revertedWith("Only VOTING topics can be voted");
+  });
+
+  it("Should NOT vote twice (already voted)", async function () {
+    const { contract, manager, resident } = await loadFixture(deployFixture);
+
+    await contract.addResident(resident.address, 1202);
+
+    const instance = contract.connect(resident);
+    await instance.addTopic("topic", "description");
+
+    await contract.openVoting("topic");
+  
+    await instance.vote("topic", Options.NO);
+
+    await expect(instance.vote("topic", Options.YES))
+    .to.be.revertedWith("A residence should vote only once");
+  });
+
+  it("Should NOT vote (permission)", async function () {
+    const { contract, manager, resident } = await loadFixture(deployFixture);
+    
+    const instance = contract.connect(resident);
+    
+    await contract.addTopic("topic", "description");
+
+    await contract.openVoting("topic");
+  
+    await expect(instance.vote("topic", Options.YES))
+    .to.be.revertedWith("Only the manager or the residents can do this");
   });
 
 });
