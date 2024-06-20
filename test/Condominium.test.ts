@@ -11,6 +11,13 @@ describe("Condominium", function () {
     ABSTENTION = 3
   }
 
+  enum Status {
+    IDLE = 1,
+    VOTING = 2,
+    APPROVED = 3,
+    DENIED = 4
+  }
+
   async function deployFixture() {
     const [manager, resident] = await hre.ethers.getSigners();
 
@@ -296,5 +303,20 @@ describe("Condominium", function () {
     await expect(instance.vote("topic", Options.YES))
     .to.be.revertedWith("Only the manager or the residents can do this");
   });
+
+  // it("Should close voting", async function () {
+  //   const { contract, manager, resident } = await loadFixture(deployFixture);
+
+  //   await contract.addResident(resident.address, 1202);
+
+  //   const instance = contract.connect(resident);
+  //   await instance.addTopic("topic", "description");
+    
+  //   await contract.openVoting("topic");
+
+  //   await instance.vote("topic", Options.YES);
+
+  //   expect(await contract.votesCounter("topic")).to.equal(1);
+  // });
 
 });
