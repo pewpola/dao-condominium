@@ -199,7 +199,7 @@ contract Condominium {
         require(topic.createdDate > 0, "The topic does not exist");
         require(
             topic.status == Status.IDLE,
-            "Only VOTING topics can be open for closed"
+            "Only VOTING topics can be closed"
         );
 
         uint8 approved = 0;
