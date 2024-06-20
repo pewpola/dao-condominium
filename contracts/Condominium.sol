@@ -223,4 +223,9 @@ contract Condominium {
 
         topics[topicId].endDate = block.timestamp;
     }
+
+    function votesCounter(string memory title) external view returns(uint256) {
+        bytes32 topicId = keccak256(bytes(title));
+        return votings[topicId].length;
+    }
 }
