@@ -3,6 +3,14 @@ import { expect } from "chai";
 import hre from "hardhat";
 
 describe("Condominium", function () {
+
+  enum Status {
+    IDLE = 0,
+    VOTING = 1,
+    APPROVED = 2,
+    DENIED = 3
+  }
+
   async function deployFixture() {
     const [manager, resident] = await hre.ethers.getSigners();
 
