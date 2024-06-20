@@ -198,4 +198,14 @@ describe("Condominium", function () {
     .to.be.revertedWith("Only the manager can do this");
   });
 
+  it("Should NOT remove topic (not a idle topic)", async function () {
+    const { contract, manager, resident } = await loadFixture(deployFixture);
+
+    await contract.addTopic("test", "test test");
+    await contract.openVoting("test");
+    
+    await expect(contract.removeTopic("test"))
+    .to.be.revertedWith("Only IDLE topics can be removed");
+  });
+
 });
