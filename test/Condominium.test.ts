@@ -213,7 +213,7 @@ describe("Condominium", function () {
     .to.be.revertedWith("Only the manager can do this");
   });
 
-  it("Should NOT remove topic (not a idle topic)", async function () {
+  it("Should NOT remove topic (not an idle topic)", async function () {
     const { contract, manager, resident } = await loadFixture(deployFixture);
 
     await contract.addTopic("test", "test test");
@@ -221,6 +221,45 @@ describe("Condominium", function () {
     
     await expect(contract.removeTopic("test"))
     .to.be.revertedWith("Only IDLE topics can be removed");
+  });
+
+  it("Should open voting", async function () {
+    const { contract, manager, resident } = await loadFixture(deployFixture);
+
+    await contract.addTopic("topic", "description");    
+    await contract.openVoting("topic");
+
+    const topic = await contract.getTopic("topic");
+
+    expect(topic.status).to.equal(Status.VOTING);
+  });
+
+  it("Should NOT open voting (topic does not exist)", async function () {
+    const { contract, manager, resident } = await loadFixture(deployFixture);
+
+    await expect(contract.openVoting("topic"))
+    .to.be.revertedWith("The topic does not exist");
+  });
+
+  it("Should NOT open voting (not an idle topic)", async function () {
+    const { contract, manager, resident } = await loadFixture(deployFixture);
+
+    await contract.addTopic("topic", "description");  
+    await contract.openVoting("topic");
+
+    await expect(contract.openVoting("topic"))
+    .to.be.revertedWith("Only IDLE topics can be open for voting");
+  });
+
+  it("Should NOT open voting (permission)", async function () {
+    const { contract, manager, resident } = await loadFixture(deployFixture);
+
+    await contract.addTopic("topic", "description");  
+
+    const instance = contract.connect(resident);
+
+    await expect(instance.openVoting("topic"))
+    .to.be.revertedWith("Only the manager can do this");
   });
 
   it("Should vote", async function () {
