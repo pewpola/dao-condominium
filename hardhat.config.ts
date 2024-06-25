@@ -34,6 +34,11 @@ const config: HardhatUserConfig = {
       accounts: {
         mnemonic: process.env.SECRET
       }
+    },
+    besuWallet: {
+      url: process.env.AZURE_URL,
+      chainId: 179179,
+      accounts: [`${process.env.ACCOUNT1}`, `${process.env.ACCOUNT2}`]
     }
   },
   etherscan: {
