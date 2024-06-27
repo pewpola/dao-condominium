@@ -57,4 +57,27 @@ describe("Condominium", function () {
     .to.be.revertedWith("You do not have permission");
   });
 
+  it("Should add resident", async function () {
+    const { adapter, manager, accounts } = await loadFixture(deployAdapterFixture);
+    const { contract } = await loadFixture(deployImplementationFixture);
+
+    const contractAddress = await contract.getAddress();
+    await adapter.upgrade(contractAddress);
+    await adapter.addResident(accounts[1].address, 1301);
+
+    expect(await contract.isResident(accounts[1].address)).to.equal(true);
+  });
+
+  it("Should remove resident", async function () {
+    const { adapter, manager, accounts } = await loadFixture(deployAdapterFixture);
+    const { contract } = await loadFixture(deployImplementationFixture);
+
+    const contractAddress = await contract.getAddress();
+    await adapter.upgrade(contractAddress);
+    await adapter.addResident(accounts[1].address, 1301);
+    await adapter.removeResident(accounts[1].address);
+
+    expect(await contract.isResident(accounts[1].address)).to.equal(false);
+  });
+
 });
