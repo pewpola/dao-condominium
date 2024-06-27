@@ -80,4 +80,28 @@ describe("Condominium", function () {
     expect(await contract.isResident(accounts[1].address)).to.equal(false);
   });
 
+  it("Should set counselor", async function () {
+    const { adapter, manager, accounts } = await loadFixture(deployAdapterFixture);
+    const { contract } = await loadFixture(deployImplementationFixture);
+
+    const contractAddress = await contract.getAddress();
+    await adapter.upgrade(contractAddress);
+    await adapter.addResident(accounts[1].address, 1301);
+    await adapter.setCounselor(accounts[1].address, true);
+
+    expect(await contract.counselors(accounts[1].address)).to.equal(true);
+  });
+
+  it("Should set manager", async function () {
+    const { adapter, manager, accounts } = await loadFixture(deployAdapterFixture);
+    const { contract } = await loadFixture(deployImplementationFixture);
+
+    const contractAddress = await contract.getAddress();
+    await adapter.upgrade(contractAddress);
+    await adapter.addResident(accounts[1].address, 1301);
+    await adapter.setManager(accounts[1].address);
+
+    expect(await contract.manager()).to.equal(accounts[1].address);
+  });
+
 });
