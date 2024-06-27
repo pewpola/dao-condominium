@@ -30,6 +30,10 @@ contract Condominium is ICondominium {
         }
     }
 
+    function getAddress() external view returns(address) {
+        return address(this);
+    }
+
     modifier onlyManager() {
         require(msg.sender == manager, "Only the manager can do this");
         _;
