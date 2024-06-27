@@ -141,4 +141,33 @@ describe("CondominiumAdapter", function () {
     expect(topic.status).to.equal(Status.VOTING);
   });
 
+  it("Should vote", async function () {
+    const { adapter, manager, accounts } = await loadFixture(deployAdapterFixture);
+    const { contract } = await loadFixture(deployImplementationFixture);
+
+    const contractAddress = await contract.getAddress();
+    await adapter.upgrade(contractAddress);
+    await adapter.addTopic("topic", "description");
+    await adapter.openVoting("topic");
+    await adapter.vote("topic", Options.YES);
+    
+    expect(await contract.votesCounter("topic")).to.equal(1);
+  });
+
+  it("Should close voting", async function () {
+    const { adapter, manager, accounts } = await loadFixture(deployAdapterFixture);
+    const { contract } = await loadFixture(deployImplementationFixture);
+
+    const contractAddress = await contract.getAddress();
+    await adapter.upgrade(contractAddress);
+    await adapter.addTopic("topic", "description");
+    await adapter.openVoting("topic");
+    await adapter.vote("topic", Options.YES);
+    await adapter.closeVoting("topic");
+    
+    const topic = await contract.getTopic("topic");
+
+    expect(topic.status).to.equal(Status.APPROVED);
+  });
+
 });
