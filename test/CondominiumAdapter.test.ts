@@ -2,7 +2,7 @@ import { loadFixture } from "@nomicfoundation/hardhat-toolbox/network-helpers";
 import { expect } from "chai";
 import hre from "hardhat";
 
-describe("Condominium", function () {
+describe("CondominiumAdapter", function () {
 
   enum Options {
     EMPTY = 0,
@@ -102,6 +102,43 @@ describe("Condominium", function () {
     await adapter.setManager(accounts[1].address);
 
     expect(await contract.manager()).to.equal(accounts[1].address);
+  });
+
+  it("Should add topic", async function () {
+    const { adapter, manager, accounts } = await loadFixture(deployAdapterFixture);
+    const { contract } = await loadFixture(deployImplementationFixture);
+
+    const contractAddress = await contract.getAddress();
+    await adapter.upgrade(contractAddress);
+    await adapter.addTopic("topic", "description");
+
+    expect(await contract.topicExists("topic")).to.equal(true);
+  });
+
+  it("Should remove topic", async function () {
+    const { adapter, manager, accounts } = await loadFixture(deployAdapterFixture);
+    const { contract } = await loadFixture(deployImplementationFixture);
+
+    const contractAddress = await contract.getAddress();
+    await adapter.upgrade(contractAddress);
+    await adapter.addTopic("topic", "description");
+    await adapter.removeTopic("topic");
+
+    expect(await contract.topicExists("topic")).to.equal(false);
+  });
+
+  it("Should open voting", async function () {
+    const { adapter, manager, accounts } = await loadFixture(deployAdapterFixture);
+    const { contract } = await loadFixture(deployImplementationFixture);
+
+    const contractAddress = await contract.getAddress();
+    await adapter.upgrade(contractAddress);
+    await adapter.addTopic("topic", "description");
+    await adapter.openVoting("topic");
+    
+    const topic = await contract.getTopic("topic");
+
+    expect(topic.status).to.equal(Status.VOTING);
   });
 
 });
