@@ -11,7 +11,7 @@ contract CondominiumAdapter {
         owner = msg.sender;
     }
 
-    function getAddress() external view returns(address) {
+    function getImplementationAddress() external view returns(address) {
         return address(implementation);
     }
 
